@@ -4,28 +4,38 @@ A native Android data-usage monitor and local firewall with an original, peacefu
 
 ## Installable build
 
-[Download the APK](downloads/StillData-1.0-release.apk) · [Quick setup guide](downloads/SETUP.md)
+[Download the APK](downloads/StillData-1.1-release.apk) · [Quick setup guide](downloads/SETUP.md)
 
-This is a first locally signed build. Compilation, APK signing, and 16 core logic checks passed. Android device behavior remains unverified because the available emulator could not complete startup. See [validation details](VALIDATION.md).
+This is a first locally signed build. Compilation, APK signing, and 37 core logic checks passed. Android device behavior remains unverified because the available emulator could not complete startup. See [validation details](VALIDATION.md).
 
-## What works
+## Features
 
 - Device and per-app mobile/Wi-Fi usage from Android NetworkStatsManager, with Today, seven-day, and billing-cycle views.
 - Every installed app, including system apps; shared Android UIDs are grouped so usage is not double-counted. Search and progressive loading keep the app list responsive.
 - Independent mobile and Wi-Fi blocking rules. A local VpnService captures only selected apps and discards their IPv4/IPv6 packets. Allowed apps bypass it and retain their connection.
-- Quiet Mode blocks all apps on mobile data while leaving Wi-Fi rules independent.
+- Independent Mobile and Wi-Fi controls: pause/resume each rule set, block every app on either network, or allow every app on either network. Per-app switches and usage sorting follow the selected network.
 - Persistent rules, a billing budget, real seven-day usage chart, blocked-packet counters, and a foreground notification with a stop action.
 - System-wide domain-based ad/tracker blocking through Android Private DNS, with setup for AdGuard DNS or Control D. The app verifies the active provider using Android's network state; it cannot silently change that system setting.
-- Mountain scenery and gentle snow that respect Android animation and battery settings.
+- A visible, interactive alpine landscape with density-scaled snowfall, drifting clouds, a moving skier, gentle screen transitions, and touch ripples. Animation status explains app, Battery Saver, and system animation pauses.
+- Enable all / Disable all for five local features: tracking, the app firewall, mobile rules, Wi-Fi rules, and animations. Saved app choices are retained. Private DNS remains a separate Android setting, with explicit enable and disable guides.
 
 ## Install on your S25 Ultra
 
-1. Transfer `StillData-1.0-release.apk` to your phone and open it. Allow installation from the browser or Files app if Android asks.
+1. Transfer `StillData-1.1-release.apk` to your phone and open it. Allow installation from the browser or Files app if Android asks.
 2. Open Still Data. Tap **Allow usage access**, enable Still Data in Android settings, then return.
-3. In **Apps**, switch off Mobile access or Wi-Fi access for apps you want to block.
+3. In **Apps**, choose **Mobile data** or **Wi-Fi**. Use that network’s rule switch, Block all / Allow all buttons, or individual app access switches.
 4. In **Guard**, tap **Enable firewall** and approve Android's VPN prompt. Allow notifications so the status and stop action are easy to reach.
-5. For ads, tap **Set up ad blocking**, copy the hostname, choose **Private DNS provider hostname** in Android settings, paste it, and save. Return and tap **Check DNS status**.
+5. For ads, tap **Enable ads filter**, copy the hostname, choose **Private DNS provider hostname** in Android settings, paste it, and save. Return and tap **Check DNS status**.
 6. If Samsung stops the foreground service, add Still Data to **Never auto sleeping apps** in Samsung Battery settings. No broad battery or device administrator permissions are requested.
+
+## New in 1.1
+
+- Master feature buttons on Overview, Guard, and Settings, plus individual feature switches.
+- Separate Mobile and Wi-Fi usage totals, history charts, access rules, and all-app blocking controls.
+- Pausing one network does not clear or affect the other network’s saved rules. Allow all clears only the selected network’s rules.
+- Usage tracking can be disabled without disabling the firewall; Android’s own system counters continue.
+- Animations are visible in a dedicated Overview panel rather than hidden behind cards. The scene can be dragged horizontally. Vertical scrolling still works over the panel.
+- Android Private DNS has separate enable/disable actions because third-party apps cannot silently change the system’s DNS setting.
 
 ## Practical limits
 
@@ -58,4 +68,4 @@ It requires Android SDK Platform 35, Build Tools 35.0.0, Eclipse ECJ 3.41.0, Pyt
 
 ## Verification
 
-See `VALIDATION.md` for checks performed and device-testing limitations. Core checks cover network-specific rules, the empty-allowlist safeguard, Quiet Mode, billing windows across month/DST boundaries, and unavailable-vs-zero usage.
+See `VALIDATION.md` for checks performed and device-testing limitations. Core checks cover master feature configuration, independent network switches and block-all modes, animation advance/pause/resume behavior, network-specific rules, the empty-allowlist safeguard, Quiet Mode, billing windows across month/DST boundaries, and unavailable-vs-zero usage.

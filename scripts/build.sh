@@ -16,7 +16,7 @@ if sys.argv[1]=='debug':root.find('application').set('{http://schemas.android.co
 tree.write('build/AndroidManifest.xml',encoding='utf-8',xml_declaration=True)
 PY
 "$still_tools/aapt2" compile --dir app/src/main/res -o build/resources.zip
-"$still_tools/aapt2" link -I "$still_platform" --manifest build/AndroidManifest.xml --java build/generated --version-code 1 --version-name 1.0.0 -o build/resources.apk build/resources.zip
+"$still_tools/aapt2" link -I "$still_platform" --manifest build/AndroidManifest.xml --java build/generated --version-code 2 --version-name 1.1.0 -o build/resources.apk build/resources.zip
 find app/src/main/java build/generated -name '*.java' > build/sources.txt
 java -jar "$still_ecj" -source 1.8 -target 1.8 -proc:none -nowarn -bootclasspath "$still_platform" -classpath "$still_tools/core-lambda-stubs.jar" -d build/classes @build/sources.txt
 python3 - <<'PY'
@@ -38,8 +38,8 @@ if [ ! -f .signing/still-local.jks ]; then
  keytool -genkeypair -keystore .signing/still-local.jks -alias still-local -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Still Data Local Build' -storepass android -keypass android >/dev/null 2>&1
 fi
 "$still_tools/zipalign" -f -P 16 4 build/unaligned.apk build/aligned.apk
-java -jar "$still_tools/lib/apksigner.jar" sign --ks .signing/still-local.jks --ks-key-alias still-local --ks-pass pass:android --key-pass pass:android --out "releases/StillData-1.0-$still_variant.apk" build/aligned.apk
-java -jar "$still_tools/lib/apksigner.jar" verify --verbose "releases/StillData-1.0-$still_variant.apk"
-"$still_tools/aapt2" dump badging "releases/StillData-1.0-$still_variant.apk" > build/badging.txt
+java -jar "$still_tools/lib/apksigner.jar" sign --ks .signing/still-local.jks --ks-key-alias still-local --ks-pass pass:android --key-pass pass:android --out "releases/StillData-1.1-$still_variant.apk" build/aligned.apk
+java -jar "$still_tools/lib/apksigner.jar" verify --verbose "releases/StillData-1.1-$still_variant.apk"
+"$still_tools/aapt2" dump badging "releases/StillData-1.1-$still_variant.apk" > build/badging.txt
 sed -n '1,4p' build/badging.txt
-printf 'APK built: releases/StillData-1.0-%s.apk\n' "$still_variant"
+printf 'APK built: releases/StillData-1.1-%s.apk\n' "$still_variant"

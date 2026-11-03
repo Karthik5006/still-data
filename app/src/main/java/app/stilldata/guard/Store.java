@@ -5,6 +5,12 @@ final class Store {
  final SharedPreferences prefs;
  Store(Context c){prefs=c.getSharedPreferences("still_data",Context.MODE_PRIVATE);}
  boolean armed(){return prefs.getBoolean("armed",false);}void armed(boolean b){prefs.edit().putBoolean("armed",b).apply();}
+ boolean tracking(){return prefs.getBoolean("tracking",true);}void tracking(boolean b){prefs.edit().putBoolean("tracking",b).apply();}
+ boolean networkEnabled(boolean wifi){return prefs.getBoolean(wifi?"wifi_enabled":"mobile_enabled",true);}void networkEnabled(boolean wifi,boolean b){prefs.edit().putBoolean(wifi?"wifi_enabled":"mobile_enabled",b).apply();}
+ boolean blockAll(boolean wifi){return prefs.getBoolean(wifi?"quiet_wifi":"quiet",false);}void blockAll(boolean wifi,boolean b){prefs.edit().putBoolean(wifi?"quiet_wifi":"quiet",b).apply();}
+ void allowAll(boolean wifi){prefs.edit().putBoolean(wifi?"quiet_wifi":"quiet",false).putStringSet(wifi?"wifi_blocked":"mobile_blocked",Collections.emptySet()).apply();}
+ FeatureState features(){return new FeatureState(tracking(),armed(),networkEnabled(false),networkEnabled(true),motion());}
+ void allFeatures(boolean enabled){FeatureState f=FeatureState.all(enabled);prefs.edit().putBoolean("tracking",f.tracking).putBoolean("armed",f.firewall).putBoolean("mobile_enabled",f.mobile).putBoolean("wifi_enabled",f.wifi).putBoolean("motion",f.motion).apply();}
  boolean quiet(){return prefs.getBoolean("quiet",false);}void quiet(boolean b){prefs.edit().putBoolean("quiet",b).apply();}
  boolean motion(){return prefs.getBoolean("motion",true);}void motion(boolean b){prefs.edit().putBoolean("motion",b).apply();}
  Set<String> blocked(boolean wifi){return new HashSet<>(prefs.getStringSet(wifi?"wifi_blocked":"mobile_blocked",Collections.emptySet()));}

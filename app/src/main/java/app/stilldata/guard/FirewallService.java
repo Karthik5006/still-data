@@ -47,13 +47,14 @@ public final class FirewallService extends VpnService {
   Network chosen=chooseNetwork();RulePlanner.NetworkKind kind=kind(chosen);
   Set<String> installed=new HashSet<>();
   for(ApplicationInfo a:getPackageManager().getInstalledApplications(0))installed.add(a.packageName);
-  RulePlanner.Plan plan=RulePlanner.plan(kind,store.quiet(),store.blocked(false),store.blocked(true),installed,getPackageName());
-  String key=(chosen==null?"offline":chosen.toString())+":"+plan.key();
+  RulePlanner.Plan plan=RulePlanner.plan(kind,store.networkEnabled(false),store.networkEnabled(true),store.blockAll(false),store.blockAll(true),store.blocked(false),store.blocked(true),installed,getPackageName());
+  boolean networkEnabled=kind==RulePlanner.NetworkKind.WIFI?store.networkEnabled(true):store.networkEnabled(false);
+  String key=(chosen==null?"offline":chosen.toString())+":"+networkEnabled+":"+plan.key();
   if(key.equals(currentKey))return;
   currentKey="";
   if(!plan.needsTunnel()){
    closeTunnel();
-   currentKey=key;setStatus(kind==RulePlanner.NetworkKind.OFFLINE?"Ready · no connection":kind==RulePlanner.NetworkKind.WIFI?"Ready · Wi-Fi":kind==RulePlanner.NetworkKind.MOBILE?"Ready · mobile data":"Ready · other network");return;
+   currentKey=key;if(!networkEnabled&&(kind==RulePlanner.NetworkKind.WIFI||kind==RulePlanner.NetworkKind.MOBILE)){setStatus((kind==RulePlanner.NetworkKind.WIFI?"Wi-Fi":"Mobile")+" rules paused");return;}setStatus(kind==RulePlanner.NetworkKind.OFFLINE?"Ready · no connection":kind==RulePlanner.NetworkKind.WIFI?"Ready · Wi-Fi":kind==RulePlanner.NetworkKind.MOBILE?"Ready · mobile data":"Ready · other network");return;
   }
   try{
    Builder b=new Builder().setSession("Still Data · local firewall").setMtu(1500).addAddress("10.111.0.1",32).addRoute("0.0.0.0",0).addAddress("fd75:51:11::1",128).addRoute("::",0).addDnsServer("10.111.0.2").setBlocking(true).setMetered(kind==RulePlanner.NetworkKind.MOBILE);
@@ -70,7 +71,7 @@ public final class FirewallService extends VpnService {
    final ParcelFileDescriptor inputFd=ParcelFileDescriptor.dup(tunnel.getFileDescriptor());final int id=generation.incrementAndGet();
    new Thread(()->drain(inputFd,id),"Still-local-firewall").start();currentKey=key;
    String network=kind==RulePlanner.NetworkKind.WIFI?"Wi-Fi":"mobile data";
-   setStatus(plan.all?"Quiet mode · mobile data blocked":"Blocking "+plan.packages.size()+" app rules · "+network);
+   setStatus(plan.all?"All apps blocked · "+network:"Blocking "+plan.packages.size()+" app rules · "+network);
   }catch(Exception e){android.util.Log.e("StillFirewall","Could not establish the local VPN",e);closeTunnel();setStatus("Firewall paused · toggle off and on to retry");}
  }
  private void drain(ParcelFileDescriptor fd,int id){

@@ -9,10 +9,14 @@ final class RulePlanner {
   String key(){List<String> sorted=new ArrayList<>(packages);Collections.sort(sorted);return all+":"+sorted.toString();}
  }
  static Plan plan(NetworkKind network,boolean quietMobile,Set<String> mobile,Set<String> wifi,Set<String> installed,String self){
-  boolean all=quietMobile&&network==NetworkKind.MOBILE;
+  return plan(network,true,true,quietMobile,false,mobile,wifi,installed,self);
+ }
+ static Plan plan(NetworkKind network,boolean mobileEnabled,boolean wifiEnabled,boolean quietMobile,boolean quietWifi,Set<String> mobile,Set<String> wifi,Set<String> installed,String self){
+  boolean active=(network==NetworkKind.MOBILE&&mobileEnabled)||(network==NetworkKind.WIFI&&wifiEnabled);
   Set<String> selected=new HashSet<>();
-  if(network==NetworkKind.MOBILE)selected.addAll(mobile);
-  if(network==NetworkKind.WIFI)selected.addAll(wifi);
+  if(!active)return new Plan(false,selected);
+  boolean all=network==NetworkKind.MOBILE?quietMobile:quietWifi;
+  selected.addAll(network==NetworkKind.MOBILE?mobile:wifi);
   selected.retainAll(installed);selected.remove(self);
   return new Plan(all,selected);
  }
